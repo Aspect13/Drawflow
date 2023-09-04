@@ -1,0 +1,7 @@
+services:
+  builder:
+    image: node:16-alpine
+    volumes:
+      - .:/app/
+    entrypoint: sh /app/build.sh
+    working_dir: /app
