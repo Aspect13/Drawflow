@@ -48,6 +48,9 @@ export default class Drawflow {
         // Mobile
         this.evCache = new Array();
         this.prevDiff = -1;
+
+        // Vue3 dynamic data node
+        this.attachVueDataProxy = true
     }
 
     start() {
@@ -1282,10 +1285,14 @@ export default class Drawflow {
                 //Vue 3
                 const props = this.noderegister[html].props || {}
                 props.node_data = data
+                props.node_id = newNodeId
                 let wrapper = this.render.h(this.noderegister[html].html, props, this.noderegister[html].options);
                 wrapper.appContext = this.parent;
                 this.render.render(wrapper, content);
-
+                if (this.attachVueDataProxy) {
+                    // console.log(wrapper)
+                    data = wrapper.component.data
+                }
             } else {
                 // Vue 2
                 let wrapper = new this.render({
@@ -1298,42 +1305,42 @@ export default class Drawflow {
             }
         }
 
-        Object.entries(data).forEach(function (key, value) {
-            if (typeof key[1] === "object") {
-                insertObjectkeys(null, key[0], key[0]);
-            } else {
-                var elems = content.querySelectorAll('[df-' + key[0] + ']');
-                for (var i = 0; i < elems.length; i++) {
-                    elems[i].value = key[1];
-                    if (elems[i].isContentEditable) {
-                        elems[i].innerText = key[1];
-                    }
-                }
-            }
-        })
+        // Object.entries(data).forEach(function (key, value) {
+        //     if (typeof key[1] === "object") {
+        //         insertObjectkeys(null, key[0], key[0]);
+        //     } else {
+        //         var elems = content.querySelectorAll('[df-' + key[0] + ']');
+        //         for (var i = 0; i < elems.length; i++) {
+        //             elems[i].value = key[1];
+        //             if (elems[i].isContentEditable) {
+        //                 elems[i].innerText = key[1];
+        //             }
+        //         }
+        //     }
+        // })
 
-        function insertObjectkeys(object, name, completname) {
-            if (object === null) {
-                var object = data[name];
-            } else {
-                var object = object[name]
-            }
-            if (object !== null) {
-                Object.entries(object).forEach(function (key, value) {
-                    if (typeof key[1] === "object") {
-                        insertObjectkeys(object, key[0], completname + '-' + key[0]);
-                    } else {
-                        var elems = content.querySelectorAll('[df-' + completname + '-' + key[0] + ']');
-                        for (var i = 0; i < elems.length; i++) {
-                            elems[i].value = key[1];
-                            if (elems[i].isContentEditable) {
-                                elems[i].innerText = key[1];
-                            }
-                        }
-                    }
-                });
-            }
-        }
+        // function insertObjectkeys(object, name, completname) {
+        //     if (object === null) {
+        //         var object = data[name];
+        //     } else {
+        //         var object = object[name]
+        //     }
+        //     if (object !== null) {
+        //         Object.entries(object).forEach(function (key, value) {
+        //             if (typeof key[1] === "object") {
+        //                 insertObjectkeys(object, key[0], completname + '-' + key[0]);
+        //             } else {
+        //                 var elems = content.querySelectorAll('[df-' + completname + '-' + key[0] + ']');
+        //                 for (var i = 0; i < elems.length; i++) {
+        //                     elems[i].value = key[1];
+        //                     if (elems[i].isContentEditable) {
+        //                         elems[i].innerText = key[1];
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     }
+        // }
 
         node.appendChild(inputs);
         node.appendChild(content);
@@ -1421,10 +1428,15 @@ export default class Drawflow {
         } else {
             if (parseInt(this.render.version) === 3) {
                 //Vue 3
-                let wrapper = this.render.h(this.noderegister[dataNode.html].html, this.noderegister[dataNode.html].props, this.noderegister[dataNode.html].options);
+                const props = this.noderegister[dataNode.html].props || {}
+                props.node_data = dataNode.data
+                props.node_id = dataNode.id
+                let wrapper = this.render.h(this.noderegister[dataNode.html].html, props, this.noderegister[dataNode.html].options);
                 wrapper.appContext = this.parent;
                 this.render.render(wrapper, content);
-
+                if (this.attachVueDataProxy) {
+                    dataNode.data = wrapper.component.data
+                }
             } else {
                 //Vue 2
                 let wrapper = new this.render({
@@ -1436,42 +1448,42 @@ export default class Drawflow {
             }
         }
 
-        Object.entries(dataNode.data).forEach(function (key, value) {
-            if (typeof key[1] === "object") {
-                insertObjectkeys(null, key[0], key[0]);
-            } else {
-                var elems = content.querySelectorAll('[df-' + key[0] + ']');
-                for (var i = 0; i < elems.length; i++) {
-                    elems[i].value = key[1];
-                    if (elems[i].isContentEditable) {
-                        elems[i].innerText = key[1];
-                    }
-                }
-            }
-        })
+        // Object.entries(dataNode.data).forEach(function (key, value) {
+        //     if (typeof key[1] === "object") {
+        //         insertObjectkeys(null, key[0], key[0]);
+        //     } else {
+        //         var elems = content.querySelectorAll('[df-' + key[0] + ']');
+        //         for (var i = 0; i < elems.length; i++) {
+        //             elems[i].value = key[1];
+        //             if (elems[i].isContentEditable) {
+        //                 elems[i].innerText = key[1];
+        //             }
+        //         }
+        //     }
+        // })
 
-        function insertObjectkeys(object, name, completname) {
-            if (object === null) {
-                var object = dataNode.data[name];
-            } else {
-                var object = object[name]
-            }
-            if (object !== null) {
-                Object.entries(object).forEach(function (key, value) {
-                    if (typeof key[1] === "object") {
-                        insertObjectkeys(object, key[0], completname + '-' + key[0]);
-                    } else {
-                        var elems = content.querySelectorAll('[df-' + completname + '-' + key[0] + ']');
-                        for (var i = 0; i < elems.length; i++) {
-                            elems[i].value = key[1];
-                            if (elems[i].isContentEditable) {
-                                elems[i].innerText = key[1];
-                            }
-                        }
-                    }
-                });
-            }
-        }
+        // function insertObjectkeys(object, name, completname) {
+        //     if (object === null) {
+        //         var object = dataNode.data[name];
+        //     } else {
+        //         var object = object[name]
+        //     }
+        //     if (object !== null) {
+        //         Object.entries(object).forEach(function (key, value) {
+        //             if (typeof key[1] === "object") {
+        //                 insertObjectkeys(object, key[0], completname + '-' + key[0]);
+        //             } else {
+        //                 var elems = content.querySelectorAll('[df-' + completname + '-' + key[0] + ']');
+        //                 for (var i = 0; i < elems.length; i++) {
+        //                     elems[i].value = key[1];
+        //                     if (elems[i].isContentEditable) {
+        //                         elems[i].innerText = key[1];
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     }
+        // }
 
         node.appendChild(inputs);
         node.appendChild(content);
@@ -1480,6 +1492,7 @@ export default class Drawflow {
         node.style.left = dataNode.pos_x + "px";
         parent.appendChild(node);
         this.precanvas.appendChild(parent);
+        // this.dispatch('nodeImported', newNodeId);
     }
 
     addRerouteImport(dataNode) {
@@ -1544,6 +1557,13 @@ export default class Drawflow {
                 this.dispatch('nodeDataChanged', event.target.closest(".drawflow_content_node").parentElement.id.slice(5));
             }
         }
+    }
+
+    collectVueComponentData(event, nodeId, updatedData) {
+        console.log('updateNodeVueValue', {event, nodeId, updatedData})
+        // const nodeId = event.target.closest(".drawflow_content_node").parentElement.id.slice(5)
+        this.drawflow.drawflow[this.module].data[nodeId].data = updatedData
+        this.dispatch('nodeDataChanged', nodeId)
     }
 
     updateNodeDataFromId(id, data) {
