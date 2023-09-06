@@ -51,6 +51,9 @@ export default class Drawflow {
 
         // Vue3 dynamic data node
         this.attachVueDataProxy = true
+
+        // skip serialization of keys during import
+        this.exportSkipKeys = []
     }
 
     start() {
@@ -1990,7 +1993,8 @@ export default class Drawflow {
     }
 
     export() {
-        const dataExport = JSON.parse(JSON.stringify(this.drawflow));
+        const serializationFilter = (k, v) => this.exportSkipKeys.includes(k) ? undefined : v
+        const dataExport = JSON.parse(JSON.stringify(this.drawflow, serializationFilter));
         this.dispatch('export', dataExport);
         return dataExport;
     }
